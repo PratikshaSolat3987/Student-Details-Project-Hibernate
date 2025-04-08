@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register Student</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Register New Student</h2>
+    <form id="registerForm">
+        <input type="hidden" name="action" value="register">
+        <div>
+            <label>First Name:</label>
+            <input type="text" name="firstName" required>
+        </div>
+        <div>
+            <label>Last Name:</label>
+            <input type="text" name="lastName" required>
+        </div>
+        <div>
+            <label>Email:</label>
+            <input type="email" name="email" required>
+        </div>
+        <div>
+            <label>Mobile:</label>
+            <input type="tel" name="mobileNumber" required>
+        </div>
+        <div>
+            <label>Course:</label>
+            <input type="text" name="course" required>
+        </div>
+        <div>
+            <label>Grade:</label>
+            <input type="text" name="grade" required>
+        </div>
+        <button type="submit">Register</button>
+    </form>
+    <p id="message"></p>
+
+    <script>
+        const baseUrl = window.location.pathname.includes('StudentCRUD') ? '/StudentCRUD' : '';
+        const studentsUrl = `${baseUrl}/students`;
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch(studentsUrl, {
+                method: 'POST',
+                body: new URLSearchParams(formData),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const message = document.getElementById('message');
+                if (data.error) {
+                    message.style.color = 'red';
+                    message.textContent = data.error === 'Invalid action' ? 'Invalid' : data.error;
+                } else {
+                    message.style.color = 'green';
+                    message.textContent = data.message;
+                    this.reset();
+                    setTimeout(() => window.location.href = 'displayStudent.html', 1000);
+                }
+            })
+            .catch(error => {
+                document.getElementById('message').textContent = 'Error: ' + error.message;
+            });
+        });
+    </script>
+</body>
+</html>
